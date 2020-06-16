@@ -1,15 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
 
 // Components
 import Whiteboard from "components/whiteboard";
+import Toolbar from "components/toolbar";
+
+// Store
+import store from "store";
+
+// React Redux
+import { Provider } from "react-redux";
 
 function App() {
+
   return (
-    <div className="App">
-      <Whiteboard width={"90vw"} height={"90vh"} />
-    </div>
+    <Provider store={store}>
+      <div className="App">
+        <Toolbar />
+        <Whiteboard width={"100%"} height={"100%"} />
+      </div>
+    </Provider>
   );
 }
 

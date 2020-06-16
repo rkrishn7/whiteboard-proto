@@ -1,0 +1,22 @@
+.dropdown {
+    display: block;
+    padding: 0.5rem 1rem;
+}
+
+.colorDialog {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background-color: black;
+    border: 1px solid white;
+}
+
+.colorDialog:hover {
+    border: 1px solid pink;
+}
+
+.customMenu {
+    background-color: transparent;
+    border: none;
+    padding-right: 15%;
+}

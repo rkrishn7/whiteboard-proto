@@ -9,7 +9,12 @@ export default class Wrapper extends React.Component {
             height: 300
         };
 
-        window.addEventListener("resize", this.resize.bind(this));
+        /**
+         * Remove event listener for resize.
+         * Task: Figure out how to save data on canvas resize and redisplay it
+         */
+
+        //window.addEventListener("resize", this.resize.bind(this));
 
         this.wrapper = React.createRef();
     }
@@ -24,10 +29,6 @@ export default class Wrapper extends React.Component {
 
     componentDidMount() {
         this.resize();
-    }
-
-    componentDidUpdate() {
-        console.log("wrapper update");
     }
 
     render() {

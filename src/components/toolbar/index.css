@@ -1,0 +1,23 @@
+.navbar-light .navbar-brand {
+    color: white;
+}
+
+.navbar-light .navbar-brand:hover {
+    color: pink;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: white;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+    color: pink;
+}
+
+.toolbar {
+    background-color: blue;
+    color: white;
+    -webkit-box-shadow: 0px 1px 13px 3px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 1px 13px 3px rgba(0,0,0,0.75);
+    box-shadow: 0px 1px 13px 3px rgba(0,0,0,0.75);
+}

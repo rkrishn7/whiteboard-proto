@@ -1,6 +1,6 @@
 import {
     SET_WHITEBOARD_COLOR
-} from "constants/index.js";
+} from "constants/whiteboard";
 
 const initialState = {
     color: "#000000",

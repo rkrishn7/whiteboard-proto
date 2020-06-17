@@ -1,9 +1,9 @@
 import React from "react";
 import "./App.css";
 
-// Components
-import Whiteboard from "components/whiteboard";
-import Toolbar from "components/toolbar";
+// Routes
+import Whiteboard from "routes/whiteboard";
+import Landing from "routes/landing";
 
 // Store
 import store from "store";
@@ -11,14 +11,27 @@ import store from "store";
 // React Redux
 import { Provider } from "react-redux";
 
+// React Router
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+
 function App() {
 
   return (
     <Provider store={store}>
-      <div className="App">
-        <Toolbar />
-        <Whiteboard width={"100%"} height={"100%"} />
-      </div>
+      <Router>
+        <Switch>
+            <Route exact path="/">
+              <Landing />
+            </Route>
+            <Route path="/whiteboard">
+              <Whiteboard />
+            </Route>
+        </Switch>
+      </Router>
     </Provider>
   );
 }

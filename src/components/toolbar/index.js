@@ -1,10 +1,13 @@
 import React from "react";
 
+// React Bootstrap
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 
+// Misc
 import ColorPicker from "components/color-picker";
 
+// CSS
 import "./index.css";
 
 

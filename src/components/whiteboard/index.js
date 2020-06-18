@@ -9,6 +9,7 @@ import { debug } from "utils";
 
 // SocketIO
 import socket from "socketio";
+import events from "socketio/events";
 
 // CSS
 import "./whiteboard.css";
@@ -33,9 +34,7 @@ class Whiteboard extends React.Component {
         this.endDrawing     = this.endDrawing.bind(this);  
         this.draw           = this.draw.bind(this);
 
-        socket.on("drawData", (function(data) {
-
-            console.log("data");
+        socket.on(events.DRAW, (function(data) {
 
             const self = this.whiteboard.current;
 
@@ -125,15 +124,20 @@ Whiteboard.prototype.draw = function(event) {
     context.lineTo(this.coordinates.x, this.coordinates.y);
     context.stroke();
 
-    socket.emit("DRAW", {
-        coordinates,
-        room: "Test"
-    });
+    console.log(this.props.roomId);
+
+    if(this.props.roomId) {
+        socket.emit(events.DRAW, {
+            coordinates,
+            roomId: this.props.roomId
+        });
+    }
 };
 
 const mapStateToProps = (state) => ({
     color: state.whiteboard.color,
     lineWidth: state.whiteboard.lineWidth,
+    roomId: state.socket.room.id
 });
 
 export default connect(mapStateToProps)(Whiteboard);

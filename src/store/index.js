@@ -4,7 +4,12 @@ import rootReducer from "reducers";
 
 // Redux
 
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 
-export default createStore(rootReducer);
+import logger from "redux-logger";
+
+export default createStore(
+    rootReducer,
+    applyMiddleware(logger)
+);
 

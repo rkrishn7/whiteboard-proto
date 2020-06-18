@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -6,19 +6,49 @@ import Form from "react-bootstrap/Form";
 
 import "./index.css";
 
+// React Redux
+import { connect } from "react-redux";
+
+// Actions
+import { setRoomDetails } from "actions/socket";
+
 // React Router
 import { useHistory } from "react-router-dom";
 
 // Socket
-import { createRoom } from "socketio";
+import socket from "socketio";
+import events from "socketio/events";
 
-export default function Landing() {
+function Landing(props) {
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     const [validated, setValidated] = useState(false);
 
+    const [userJoinCode, setUserJoinCode] = useState(null);
+
     const history = useHistory();
+
+    useEffect(() => {
+
+        socket.on(events.JOIN_ROOM, function (data) {
+            console.log("Joined room");
+            props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
+            history.push("/whiteboard");
+        });
+    
+        socket.on(events.JOIN_ERROR, function (data) {
+            console.log(data.error);
+        });
+    
+        socket.on(events.CREATE_ROOM, function (data) {
+            console.log("Created room");
+            console.log(data);
+            props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
+            history.push("/whiteboard");
+        });
+
+    }, []);
 
     function handleShow(button) {
         if (button === 'join') {
@@ -39,16 +69,23 @@ export default function Landing() {
     function handleLaunchSession(e) {
         const form = e.currentTarget;
 
-        if(form.checkValidity() === false) {
+        if (form.checkValidity() === false) {
             e.preventDefault();
             e.stopPropagation();
         }
         else {
-            createRoom("Test");
-            history.push("/whiteboard");
+            e.preventDefault();
+            e.stopPropagation();
+            socket.emit(events.CREATE_ROOM, { displayName: "Test" });
         }
 
         setValidated(true);
+    }
+
+    function handleJoinSession(e) {
+        e.preventDefault();
+
+        socket.emit(events.JOIN_ROOM, { joinCode: userJoinCode });
     }
 
     return (
@@ -72,6 +109,19 @@ export default function Landing() {
                     <Modal.Title>Join a Session</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <Form onSubmit={handleJoinSession}>
+                        <Form.Control 
+                        required 
+                        placeholder="Invite Code"
+                        value={userJoinCode}
+                        onChange={(e) => setUserJoinCode(e.target.value)} />
+                        <Form.Text className="text-muted">
+                            The room's invite code
+                        </Form.Text>
+                        <Button variant="primary" type="submit">
+                                Join a session!
+                        </Button>
+                    </Form>
                 </Modal.Body>
             </Modal>
             <Modal
@@ -104,3 +154,9 @@ export default function Landing() {
         </>
     )
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    setRoomDetails: (joinCode, displayName, id) => dispatch(setRoomDetails(joinCode, displayName, id))
+});
+
+export default connect(null, mapDispatchToProps)(Landing);

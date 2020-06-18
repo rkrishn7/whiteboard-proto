@@ -1,0 +1,1 @@
+export const SET_ROOM_DETAILS   = "SET_ROOM_DETAILS";

@@ -20,7 +20,6 @@ const Hashids   = require("hashids/cjs");
 
 const hashids   = new Hashids("LOAD FROM .env", 4);
 
-
 /**
  * Each event handler is invoked with three arguments
  * server (socketio server instance)
@@ -40,16 +39,16 @@ e.use = function(name, fn) {
 e.use(Events.DRAW, function(io, socket, data) {
 
     const {
-        room
+        roomId
     } = data;
 
-    socket.broadcast.to(room).emit(Events.DRAW, data);
+    socket.broadcast.to(roomId).emit(Events.DRAW, data);
 });
 
 e.use(Events.CREATE_ROOM, function(io, socket, data) {
 
     const {
-        name
+        displayName
     } = data;
 
     /**
@@ -66,15 +65,16 @@ e.use(Events.CREATE_ROOM, function(io, socket, data) {
     const encoded   = crypto.createHash("sha1").update(timestamp + random).digest("hex");
 
     socket.join(encoded, () => {
-        // Generate unique code for each room
+        // Generate unique join code for each room
         const rooms     = io.sockets.adapter.rooms;
         const joinCode  = rooms[encoded].joinCode = hashids.encode(Object.keys(rooms).length);
         
-        rooms[encoded].displayName = name;
+        rooms[encoded].displayName = displayName;
 
         socket.emit(Events.CREATE_ROOM, {
-            ...data,
-            joinCode
+            displayName,
+            joinCode,
+            roomId: encoded
         });
 
         console.log(rooms);
@@ -89,14 +89,30 @@ e.use(Events.JOIN_ROOM, function(io, socket, data) {
 
     const rooms = io.sockets.adapter.rooms;
 
-    const match = Object.keys(rooms).find(room => rooms[room].joinCode == joinCode);
+    var roomId;
 
-    if(typeof match === "undefined")
-        return;
+    const match = Object.keys(rooms).find(room => {
+
+        if(rooms[room].joinCode == joinCode) {
+            roomId = room;
+            return true;
+        }
+
+        return false;
+        
+    });
+
+    if(typeof match === "undefined") {
+        return socket.emit(Events.JOIN_ERROR, {
+            error: "Invalid Join Code"
+        });
+    }
     
     socket.join(match, () => {
         socket.emit(Events.JOIN_ROOM, {
-            roomName: match
+            displayName: match.displayName,
+            joinCode,
+            roomId
         });
     });
 });

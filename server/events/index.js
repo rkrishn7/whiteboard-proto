@@ -1,8 +1,25 @@
 /**
- * Events
+ * Node Core
  */
 
-const Events = require("./constants");
+const crypto    = require("crypto");
+const process   = require("process");
+
+
+/**
+ * Event Constants
+ */
+
+const Events    = require("./constants");
+
+/**
+ * Misc
+ */
+
+const Hashids   = require("hashids/cjs");
+
+const hashids   = new Hashids("LOAD FROM .env", 4);
+
 
 /**
  * Each event handler is invoked with three arguments
@@ -35,11 +52,25 @@ e.use(Events.CREATE_ROOM, function(io, socket, data) {
         name
     } = data;
 
-    // Maybe add unique code to each room instance?
-    socket.join(name, () => {
-        // Generate unique code for each room (TODO)
+    /**
+     * We need to ensure every room name we store is unique, even though they may have
+     * overlapping "real" names.
+     * 
+     * We'll create a hash with 20 random bytes, the current timestamp, and the user provided
+     * room name to ensure uniqueness.
+     */
+
+    const timestamp = (new Date()).valueOf().toString();
+    const random    = crypto.randomBytes(20).toString("hex");
+
+    const encoded   = crypto.createHash("sha1").update(timestamp + random).digest("hex");
+
+    socket.join(encoded, () => {
+        // Generate unique code for each room
         const rooms     = io.sockets.adapter.rooms;
-        const joinCode  = rooms[name].joinCode = Object.keys(rooms).length;
+        const joinCode  = rooms[encoded].joinCode = hashids.encode(Object.keys(rooms).length);
+        
+        rooms[encoded].displayName = name;
 
         socket.emit(Events.CREATE_ROOM, {
             ...data,

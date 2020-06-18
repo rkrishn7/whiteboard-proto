@@ -62,7 +62,7 @@ e.use(Events.CREATE_ROOM, function(io, socket, data) {
     const timestamp = (new Date()).valueOf().toString();
     const random    = crypto.randomBytes(20).toString("hex");
 
-    const encoded   = crypto.createHash("sha1").update(timestamp + random).digest("hex");
+    const encoded   = crypto.createHash("sha1").update(timestamp + random + displayName).digest("hex");
 
     socket.join(encoded, () => {
         // Generate unique join code for each room

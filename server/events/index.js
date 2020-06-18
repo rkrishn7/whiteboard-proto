@@ -13,27 +13,24 @@ e.use = function(name, fn) {
     });
 };
 
-e.use(Events.DRAW, function(data) {
+e.use(Events.DRAW, function(socket, data) {
 
     const {
         room
     } = data;
 
-    const socket = this;
-
     socket.broadcast.to(room).emit(Events.DRAW, data);
 });
 
-e.use(Events.CREATE_ROOM, function(data) {
+e.use(Events.CREATE_ROOM, function(socket, data) {
 
     const {
         name
     } = data;
 
-    const socket = this;
-
+    // Maybe add unique code to each room instance?
     socket.join(name, () => {
-        console.log(Object.keys(socket.rooms));
+        console.log(this.connections.adapter.rooms);
     });
 
     socket.emit(Events.CREATE_ROOM, data);

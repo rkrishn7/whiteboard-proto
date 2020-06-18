@@ -13,6 +13,7 @@ class Manager {
     }
 
     registerEvents() {
+
         const self = this;
 
         this.io.on("connection", function (socket) {
@@ -20,13 +21,11 @@ class Manager {
 
                 // Log events
                 socket.on(name, logger(name));
-
-                socket.on(name, (function() {
-                    console.log(this.connections);
-                }).bind(self));
                 
                 // Register event handlers
-                socket.on(name, handler.bind(socket));
+                socket.on(name, (data) => {
+                    handler.call(self, socket, data);
+                });
             });
         });
     }

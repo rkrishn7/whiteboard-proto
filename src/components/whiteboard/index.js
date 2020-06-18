@@ -51,8 +51,8 @@ class Whiteboard extends React.Component {
             context.lineCap = "round";
             context.strokeStyle = "green";
 
-            context.moveTo(data.x1, data.y1);
-            context.lineTo(data.x2, data.y2);
+            context.moveTo(data.coordinates.x1, data.coordinates.y1);
+            context.lineTo(data.coordinates.x2, data.coordinates.y2);
             context.stroke();
             
         }).bind(this));
@@ -125,7 +125,10 @@ Whiteboard.prototype.draw = function(event) {
     context.lineTo(this.coordinates.x, this.coordinates.y);
     context.stroke();
 
-    socket.emit("draw", coordinates);
+    socket.emit("DRAW", {
+        coordinates,
+        room: "Test"
+    });
 };
 
 const mapStateToProps = (state) => ({

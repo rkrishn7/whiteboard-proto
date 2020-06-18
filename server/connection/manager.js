@@ -5,7 +5,6 @@ class Manager {
 
     constructor(io) {
         this.io = io; // socketIO server instance
-        this.connections = io.sockets;
     }
 
     init() {
@@ -13,7 +12,6 @@ class Manager {
     }
 
     registerEvents() {
-
         const self = this;
 
         this.io.on("connection", function (socket) {
@@ -24,7 +22,7 @@ class Manager {
                 
                 // Register event handlers
                 socket.on(name, (data) => {
-                    handler.call(self, socket, data);
+                    handler(self.io, socket, data);
                 });
             });
         });

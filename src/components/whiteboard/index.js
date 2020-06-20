@@ -33,8 +33,10 @@ class Whiteboard extends React.Component {
         this.beginDrawing   = this.beginDrawing.bind(this);
         this.endDrawing     = this.endDrawing.bind(this);  
         this.draw           = this.draw.bind(this);
+    }
 
-        socket.on(events.DRAW, (function(data) {
+    componentDidMount() {
+        socket.on(events.DRAW, (data) => {
 
             const self = this.whiteboard.current;
 
@@ -54,7 +56,7 @@ class Whiteboard extends React.Component {
             context.lineTo(data.coordinates.x2, data.coordinates.y2);
             context.stroke();
             
-        }).bind(this));
+        });
     }
 
     render() {

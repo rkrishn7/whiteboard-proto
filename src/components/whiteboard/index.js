@@ -57,14 +57,6 @@ class Whiteboard extends React.Component {
             context.stroke();
             
         });
-
-        socket.on(events.USER_JOINED_ROOM, (data) => {
-            alert(`${data.userName} joined the room`);
-        });
-
-        socket.on(events.USER_LEFT_ROOM, (data) => {
-            alert(`${data.userName} left the room`);
-        });
     }
 
     render() {

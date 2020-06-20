@@ -1,5 +1,9 @@
 import React from "react";
 
+
+// React Redux
+import { connect } from "react-redux";
+
 // React Bootstrap
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -11,7 +15,7 @@ import ColorPicker from "components/color-picker";
 import "./index.css";
 
 
-export default class Toolbar extends React.Component {
+class Toolbar extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -19,7 +23,7 @@ export default class Toolbar extends React.Component {
     render() {
         return (
             <Navbar className="justify-content-between toolbar" expand="lg">
-                <Navbar.Brand href="/" className="brand">whiteboard.io</Navbar.Brand>
+                <Navbar.Brand href="/" className="brand">Invite Code: {this.props.joinCode}</Navbar.Brand>
                 <div>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse>
@@ -34,3 +38,9 @@ export default class Toolbar extends React.Component {
         );
     }
 }
+
+const mapStateToProps = (state) => ({
+    joinCode: state.socket.room.joinCode
+});
+
+export default connect(mapStateToProps)(Toolbar);

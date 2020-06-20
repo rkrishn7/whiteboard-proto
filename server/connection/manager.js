@@ -1,4 +1,4 @@
-const events    = require("../events/");
+const events    = require("../events");
 const logger    = require("../middleware/logger");
 
 class Manager {
@@ -15,6 +15,9 @@ class Manager {
         const self = this;
 
         this.io.on("connection", function (socket) {
+
+            console.log(socket);
+
             events.map(({ name, handler }) => {
 
                 // Log events

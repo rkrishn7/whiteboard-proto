@@ -12,7 +12,8 @@ export default function JoinModal(props) {
         onSubmit
     } = props;
 
-    const [joinCode, setJoinCode] = useState(null);
+    const [joinCode, setJoinCode]   = useState(null);
+    const [userName, setUserName]   = useState(null);
     const [validated, setValidated] = useState(false);
 
     function handleSubmit(e) {
@@ -24,7 +25,7 @@ export default function JoinModal(props) {
             e.stopPropagation();
         }
         else {
-            onSubmit({ joinCode });
+            onSubmit({ joinCode, userName });
         }
 
         setValidated(true);
@@ -42,16 +43,22 @@ export default function JoinModal(props) {
             </Modal.Header>
             <Modal.Body>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                    <Form.Control
-                    required 
-                    placeholder="Invite Code"
-                    value={joinCode}
-                    onChange={(e) => setJoinCode(e.target.value)} />
-                    <Form.Text className="text-muted">
-                        The room's invite code
-                    </Form.Text>
+                    <Form.Group>
+                        <Form.Control
+                        required 
+                        placeholder="Your Name"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Control
+                        required 
+                        placeholder="Invite Code"
+                        value={joinCode}
+                        onChange={(e) => setJoinCode(e.target.value)} />
+                    </Form.Group>
                     <Button variant="primary" type="submit">
-                        Join a session!
+                        Join session!
                     </Button>
                 </Form>
             </Modal.Body>

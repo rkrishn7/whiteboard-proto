@@ -2,5 +2,7 @@ export default Object.freeze({
     DRAW: "DRAW",
     CREATE_ROOM: "CREATE_ROOM",
     JOIN_ROOM: "JOIN_ROOM",
-    JOIN_ERROR: "JOIN_ERROR"
+    JOIN_ERROR: "JOIN_ERROR",
+    USER_JOINED_ROOM: "USER_JOINED_ROOM",
+    USER_LEFT_ROOM: "USER_LEFT_ROOM"
 });

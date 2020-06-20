@@ -36,19 +36,44 @@ e.use = function(name, fn) {
     });
 };
 
+
+/**
+ * Reserved events
+ */
+
+e.use("disconnecting", function(io, socket, data) {
+    const rooms     = io.sockets.adapter.rooms;
+    const roomIds   = Object.keys(socket.rooms);
+
+    roomIds.forEach((roomId) => {
+        // The unique rooms that sockets automatically join won't have
+        // a 'users' property, so explicity check for this.
+        if(typeof rooms[roomId].users === "undefined")
+            return;
+
+        const userName = rooms[roomId].users[socket.id].name;
+        socket.to(roomId).emit(Events.USER_LEFT_ROOM, { userName });
+    });
+});
+
+/**
+ * Defined events
+ */
+
 e.use(Events.DRAW, function(io, socket, data) {
 
     const {
         roomId
     } = data;
 
-    socket.broadcast.to(roomId).emit(Events.DRAW, data);
+    socket.to(roomId).emit(Events.DRAW, data);
 });
 
 e.use(Events.CREATE_ROOM, function(io, socket, data) {
 
     const {
-        displayName
+        displayName,
+        userName
     } = data;
 
     /**
@@ -69,7 +94,12 @@ e.use(Events.CREATE_ROOM, function(io, socket, data) {
         const rooms     = io.sockets.adapter.rooms;
         const joinCode  = rooms[encoded].joinCode = hashids.encode(Object.keys(rooms).length);
         
+        // Set display name of room
         rooms[encoded].displayName = displayName;
+
+        // Set up additional object to map socket ids to user names
+        rooms[encoded].users = {};
+        rooms[encoded].users[socket.id] = { name: userName };
 
         socket.emit(Events.CREATE_ROOM, {
             displayName,
@@ -84,7 +114,8 @@ e.use(Events.CREATE_ROOM, function(io, socket, data) {
 e.use(Events.JOIN_ROOM, function(io, socket, data) {
 
     const {
-        joinCode
+        joinCode,
+        userName
     } = data;
 
     const rooms = io.sockets.adapter.rooms;
@@ -109,10 +140,16 @@ e.use(Events.JOIN_ROOM, function(io, socket, data) {
     }
     
     socket.join(match, () => {
+
+        // Store user info
+        rooms[match].users[socket.id] = { name: userName };
+
         socket.emit(Events.JOIN_ROOM, {
             displayName: match.displayName,
             joinCode,
             roomId
         });
+
+        socket.to(roomId).emit(Events.USER_JOINED_ROOM, { userName });
     });
 });

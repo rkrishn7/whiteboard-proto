@@ -69,11 +69,11 @@ class Landing extends React.Component {
     }
 
     launchSession({ userName, roomName }) {
-        socket.emit(events.CREATE_ROOM, { displayName: roomName });
+        socket.emit(events.CREATE_ROOM, { displayName: roomName, userName });
     }
 
-    joinSession({ joinCode }) {
-        socket.emit(events.JOIN_ROOM, { joinCode });
+    joinSession({ joinCode, userName }) {
+        socket.emit(events.JOIN_ROOM, { joinCode, userName });
     }
 
     render() {

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 
+// CSS
 import "./index.css";
 
 // React Redux
@@ -13,150 +12,99 @@ import { connect } from "react-redux";
 import { setRoomDetails } from "actions/socket";
 
 // React Router
-import { useHistory } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 // Socket
 import socket from "socketio";
 import events from "socketio/events";
 
-function Landing(props) {
-    const [showJoinModal, setShowJoinModal] = useState(false);
-    const [showCreateModal, setShowCreateModal] = useState(false);
+// Misc.
+import LaunchModal from "./components/launch-modal";
+import JoinModal from "./components/join-modal";
 
-    const [validated, setValidated] = useState(false);
+class Landing extends React.Component {
 
-    const [userJoinCode, setUserJoinCode] = useState(null);
+    constructor(props) {
+        super(props);
 
-    const history = useHistory();
+        this.state = {
+            joinDialogVisible: false,
+            launchDialogVisible: false,
+        };
 
-    useEffect(() => {
+        this.setJoinDialogVisible = (visible) => {
+            this.setState((state) => ({
+                ...state,
+                joinDialogVisible: visible
+            }));
+        };
 
-        socket.on(events.JOIN_ROOM, function (data) {
-            console.log("Joined room");
-            props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
-            history.push("/whiteboard");
-        });
-    
-        socket.on(events.JOIN_ERROR, function (data) {
-            console.log(data.error);
-        });
-    
-        socket.on(events.CREATE_ROOM, function (data) {
-            console.log("Created room");
-            console.log(data);
-            props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
-            history.push("/whiteboard");
-        });
+        this.setLaunchDialogVisible = (visible) => {
+            this.setState((state) => ({
+                ...state,
+                launchDialogVisible: visible
+            }));
+        };
 
-    }, []);
-
-    function handleShow(button) {
-        if (button === 'join') {
-            setShowJoinModal(true);
-        } else if (button === 'create') {
-            setShowCreateModal(true);
-        }
-    };
-
-    function handleClose(button) {
-        if (button === 'join') {
-            setShowJoinModal(false);
-        } else if (button === 'create') {
-            setShowCreateModal(false);
-        }
+        // Bind event handlers
+        this.launchSession = this.launchSession.bind(this);
+        this.joinSession = this.joinSession.bind(this);
     }
 
-    function handleLaunchSession(e) {
-        const form = e.currentTarget;
+    componentDidMount() {
+        // Initialize events
+        socket.on(events.JOIN_ROOM, (data) => {
+            this.props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
+            this.props.history.push("/whiteboard");
+        });
 
-        if (form.checkValidity() === false) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        else {
-            e.preventDefault();
-            e.stopPropagation();
-            socket.emit(events.CREATE_ROOM, { displayName: "Test" });
-        }
+        socket.on(events.JOIN_ERROR, (data) => {
+            alert(data.error);
+        });
 
-        setValidated(true);
+        socket.on(events.CREATE_ROOM, (data) => {
+            this.props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
+            this.props.history.push("/whiteboard");
+        });
     }
 
-    function handleJoinSession(e) {
-        e.preventDefault();
-
-        socket.emit(events.JOIN_ROOM, { joinCode: userJoinCode });
+    launchSession({ userName, roomName }) {
+        socket.emit(events.CREATE_ROOM, { displayName: roomName });
     }
 
-    return (
-        <>
-            <div id='main-container'>
-                <div id='main-text'>
-                    <h1>whiteboard</h1>
-                </div>
-                <div id='main-buttons'>
-                    <Button variant='outline-primary' onClick={() => handleShow('join')}>Join a Session</Button>{' '}
-                    <Button variant='outline-success' onClick={() => handleShow('create')}>Launch a Session</Button>{' '}
+    joinSession({ joinCode }) {
+        socket.emit(events.JOIN_ROOM, { joinCode });
+    }
+
+    render() {
+        return (
+            <div>
+                <div id='main-container'>
+                    <div id='main-text'>
+                        <h1>whiteboard</h1>
+                    </div>
+                    <div id='main-buttons'>
+                        <Button variant='outline-primary' onClick={() => this.setJoinDialogVisible(true)}>Join a Session</Button>{' '}
+                        <Button variant='outline-success' onClick={() => this.setLaunchDialogVisible(true)}>Launch a Session</Button>{' '}
+                    </div>
+                    <LaunchModal
+                    visible={this.state.launchDialogVisible}
+                    onHide={() => this.setLaunchDialogVisible(false)}
+                    onSubmit={this.launchSession}
+                    />
+                    <JoinModal
+                    visible={this.state.joinDialogVisible}
+                    onHide={() => this.setJoinDialogVisible(false)}
+                    onSubmit={this.joinSession}
+                    />
                 </div>
             </div>
-            <Modal
-                show={showJoinModal}
-                onHide={() => handleClose('join')}
-                keyboard={false}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Join a Session</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form onSubmit={handleJoinSession}>
-                        <Form.Control 
-                        required 
-                        placeholder="Invite Code"
-                        value={userJoinCode}
-                        onChange={(e) => setUserJoinCode(e.target.value)} />
-                        <Form.Text className="text-muted">
-                            The room's invite code
-                        </Form.Text>
-                        <Button variant="primary" type="submit">
-                                Join a session!
-                        </Button>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-            <Modal
-                show={showCreateModal}
-                onHide={() => handleClose('create')}
-                keyboard={false}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Launch a Session</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form noValidate validated={validated} onSubmit={handleLaunchSession}>
-                        <Form.Group controlId="formBasicEmail">
-                            <Form.Control required placeholder="Your Name" />
-                            <Form.Text className="text-muted">
-                                We don't save any of your data
-                            </Form.Text>
-                        </Form.Group>
-
-                        <Form.Group controlId="formBasicPassword">
-                            <Form.Control required placeholder="Whiteboard Name" />
-                        </Form.Group>
-                        <Button variant="primary" type="submit">
-                            Launch a session!
-                        </Button>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-        </>
-    )
+        );
+    }
 }
 
 const mapDispatchToProps = (dispatch) => ({
     setRoomDetails: (joinCode, displayName, id) => dispatch(setRoomDetails(joinCode, displayName, id))
 });
 
-export default connect(null, mapDispatchToProps)(Landing);
+export default connect(null, mapDispatchToProps)(withRouter(Landing));

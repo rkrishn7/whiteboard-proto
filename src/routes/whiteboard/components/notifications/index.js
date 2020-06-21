@@ -23,12 +23,13 @@ export default function Notifications() {
                 body: `${data.userName} joined the room`
             };
 
-            setNotifications(notifications.concat([message]));
+            setNotifications(notifications => [...notifications, message]);
 
             setTimeout(() => {
-                mounted && setNotifications(notifications.slice(0, notifications.length - 1));
-            }, 10000);
 
+                mounted && setNotifications(notifications => notifications.slice(0, notifications.length - 1));
+                
+            }, 3000);
         });
 
         /*
@@ -47,16 +48,18 @@ export default function Notifications() {
         };
     }, []);
 
-
-
     return (
-        <>
+        <div style={{
+            position: 'absolute',
+            bottom: 5,
+            right: 5,
+        }}>
             {
                 notifications.map(({ title, body }) => (
                     <Notification title={title} body={body} />
                 ))
             }
-        </>
+        </div>
     );
 }
 
@@ -66,15 +69,13 @@ function Notification(props) {
         body
     } = props;
 
+    const [show, setShow] = useState(true);
+
     return (
         <Toast
-            
-            style={{
-                width: "200px",
-                position: 'absolute',
-                top: 5,
-                right: 5,
-            }}
+            show={show}
+            onClose={() => setShow(false)}
+            style={{ width: "300px" }}
         >
             <Toast.Header>
                 <strong className="mr-auto">{title}</strong>

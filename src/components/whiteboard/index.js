@@ -57,6 +57,43 @@ class Whiteboard extends React.Component {
             context.stroke();
             
         });
+
+
+
+        socket.on(events.USER_JOINED_ROOM, (data) => {
+
+            const self = this.whiteboard.current;
+
+            if(!self)
+                return;
+
+            const context = self.getContext("2d");
+
+            const imageData = Object.assign({}, context.getImageData(0, 0, self.width, self.height));
+
+            let filteredData = {};
+
+            for(let i = 0; i < imageData.data.length; i+= 4) {
+                let r = imageData.data[i + 0],
+                    g = imageData.data[i + 1],
+                    b = imageData.data[i + 2],
+                    a = imageData.data[i + 3];
+
+                if(r + b + g + a === 0)
+                    continue;
+                
+                filteredData[i + 0] = r;
+                filteredData[i + 1] = g;
+                filteredData[i + 2] = b;
+                filteredData[i + 3] = a;
+            }
+
+            imageData.data = filteredData;
+
+            console.log(imageData);
+
+            //socket.emit(events.CANVAS_DATA, imageData);
+        });
     }
 
     render() {

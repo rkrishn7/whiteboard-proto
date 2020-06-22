@@ -69,6 +69,38 @@ e.use(Events.DRAW, function(io, socket, data) {
     socket.to(roomId).emit(Events.DRAW, data);
 });
 
+e.use(Events.REQUEST_CANVAS_DATA, function(io, socket, data) {
+    const {
+        roomId
+    } = data;
+
+    const room = io.sockets.adapter.rooms[roomId];
+
+    if(typeof room === "undefined") // Emit error
+        return;
+    
+    room.users && (room.users[socket.id].requestingCanvasData = true);
+
+});
+
+e.use(Events.CANVAS_DATA, function(io, socket, data) {
+
+    const {
+        imageData,
+        roomId
+    } = data;
+
+    const room = io.sockets.adapter.rooms[roomId];
+
+    if(typeof room === "undefined") // Emit error
+        return;
+
+    Object.keys(room.users).forEach((socketId) => {
+        if(room.users[socketId].requestingCanvasData === true)
+            io.to(socketId).emit(imageData);
+    });
+});
+
 e.use(Events.CREATE_ROOM, function(io, socket, data) {
 
     const {
@@ -144,12 +176,14 @@ e.use(Events.JOIN_ROOM, function(io, socket, data) {
         // Store user info
         rooms[match].users[socket.id] = { name: userName };
 
+        console.log(rooms[match]);
+
         socket.emit(Events.JOIN_ROOM, {
             displayName: match.displayName,
             joinCode,
             roomId
         });
 
-        socket.to(roomId).emit(Events.USER_JOINED_ROOM, { userName });
+        socket.to(roomId).emit(Events.USER_JOINED_ROOM, { userName, roomId });
     });
 });

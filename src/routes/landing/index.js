@@ -54,6 +54,7 @@ class Landing extends React.Component {
     componentDidMount() {
         // Initialize events
         socket.on(events.JOIN_ROOM, (data) => {
+            socket.emit(events.REQUEST_CANVAS_DATA, { roomId: data.roomId });
             this.props.setRoomDetails(data.joinCode, data.displayName, data.roomId);
             this.props.history.push("/whiteboard");
         });

@@ -10,6 +10,7 @@ import Nav from "react-bootstrap/Nav";
 
 // Misc
 import ColorPicker from "components/color-picker";
+import PenSizeToggler from "components/pen-size-toggler";
 
 // CSS
 import "./index.css";
@@ -28,6 +29,9 @@ class Toolbar extends React.Component {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse>
                     <Nav>
+                        <Nav.Item>
+                            <PenSizeToggler />
+                        </Nav.Item>
                         <Nav.Item>
                             <ColorPicker />
                         </Nav.Item>

@@ -1,0 +1,28 @@
+.penDialog {
+    width: 25px;
+    height: 25px;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.penSize {
+    width: 15px;
+    height: 15px;
+    background-color: #000;
+    border-radius: 50%;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-pen {
+    background-color: #000;
+    border-radius: 50%;
+}

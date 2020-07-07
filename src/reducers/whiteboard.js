@@ -2,9 +2,13 @@ import {
     SET_WHITEBOARD_COLOR
 } from "constants/whiteboard";
 
+import {
+    SET_LINE_WIDTH
+} from "constants/whiteboard";
+
 const initialState = {
     color: "#000000",
-    lineWidth: 5,
+    lineWidth: 2,
 };
 
 export default function whiteboard(state = initialState, action) {
@@ -14,6 +18,11 @@ export default function whiteboard(state = initialState, action) {
                 ...state,
                 color: action.color
             };
+        case SET_LINE_WIDTH:
+            return {
+                ...state,
+                lineWidth: action.lineWidth
+            }
         default:
             return state;
     }
